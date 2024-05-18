@@ -18,21 +18,21 @@ namespace Appointments.Controllers
             _customerRepository = customerRepository;
         }
 
-        [HttpPost]
+        [HttpPost, Authorize]
         public ActionResult<Customer> CreateCustomer(string firstName, string lastName) // Vad händer utan <Customer>?
         {
             var newCustomer = _customerRepository.CreateCustomer(firstName, lastName);
             return Ok(newCustomer);
         }
 
-        [HttpGet("Get all customers")]
+        [HttpGet("Get all customers"), Authorize]
         public ActionResult GetAllCustomers(string searchParameter)
         {
             var customers = _customerRepository.GetAllCustomers(searchParameter);
             return Ok(customers);
         }
 
-        [HttpGet("Get one customer")]
+        [HttpGet("Get one customer"), Authorize]
         public ActionResult GetOneCustomer(int id)
         {
             if (!_customerRepository.CustomerExists(id))
@@ -41,7 +41,7 @@ namespace Appointments.Controllers
             return Ok(_customerRepository.GetOneCustomer(id));
         }
 
-        [HttpDelete]
+        [HttpDelete, Authorize]
         public ActionResult DeleteCustomer(int id)
         {
             if (!_customerRepository.CustomerExists(id))
@@ -52,7 +52,7 @@ namespace Appointments.Controllers
             return Ok($"Customer with ID {id} successfully deleted");
         }
 
-        [HttpPut]
+        [HttpPut, Authorize]
         public ActionResult UpdateCustomer(int id, Customer updatedCustomer)
         {
             if (id != updatedCustomer.CustomerId)

@@ -5,6 +5,8 @@ using Appointments.Interfaces;
 using Appointments.Repositories;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Models;
+using Swashbuckle.AspNetCore.Filters;
 using System.Text.Json.Serialization;
 
 // Gör så att man ser namn på kunder och företag istället för deras id
@@ -38,10 +40,29 @@ namespace Appointments
 
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen();
+
+            // mestadels nytt
+            builder.Services.AddSwaggerGen(options =>
+            {
+                options.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme
+                {
+                    In = ParameterLocation.Header,
+                    Name = "Authorization",
+                    Type = SecuritySchemeType.ApiKey
+                });
+
+                options.OperationFilter<SecurityRequirementsOperationFilter>();
+            });
 
             builder.Services.AddDbContext<DataContext>(options => options.
             UseSqlServer(builder.Configuration.GetConnectionString("Connection")));
+
+            // nytt
+            builder.Services.AddAuthorization();
+
+            // nytt
+            builder.Services.AddIdentityApiEndpoints<IdentityUser>()
+                .AddEntityFrameworkStores<DataContext>();
 
             var app = builder.Build();
 
@@ -51,6 +72,9 @@ namespace Appointments
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
+
+            // nytt
+            app.MapIdentityApi<IdentityUser>();
 
             app.UseHttpsRedirection();
 

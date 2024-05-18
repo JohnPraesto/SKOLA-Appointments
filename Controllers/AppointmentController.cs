@@ -2,6 +2,7 @@
 using Appointments.DTOs;
 using Appointments.Interfaces;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -24,7 +25,7 @@ namespace Appointments.Controllers
             _mapper = mapper;
         }
 
-        [HttpPost]
+        [HttpPost, Authorize]
         public ActionResult CreateAppointment(AppointmentDTOForCreate newAppointment)
         {
             if (!_customerRepository.CustomerExists(newAppointment.CustomerId))
@@ -37,25 +38,25 @@ namespace Appointments.Controllers
             return Ok(newAppointment);
         }
 
-        [HttpGet("Get all appointments")]
+        [HttpGet("Get all appointments"), Authorize]
         public ActionResult GetAllAppointments()
         {
             return Ok(_mapper.Map<List<AppointmentDTO>>(_appointmentRepository.GetAllAppointments()));
         }
 
-        [HttpGet("Get appointments by date")]
+        [HttpGet("Get appointments by date"), Authorize]
         public ActionResult GetAppointmentsByDate(DateTime from, DateTime to)
         {
             return Ok(_mapper.Map<List<AppointmentDTO>>(_appointmentRepository.GetAppointmentsByDate(from, to)));
         }
 
-        [HttpGet("Get discarded appointments")]
+        [HttpGet("Get discarded appointments"), Authorize]
         public ActionResult GetDiscarededAppointments()
         {
             return Ok(_appointmentRepository.GetDiscardedAppointments());
         }
 
-        [HttpGet("Get one appointment")]
+        [HttpGet("Get one appointment"), Authorize]
         public ActionResult GetAppointmentById(int id)
         {
             if (!_appointmentRepository.AppointmentExists(id))
@@ -64,7 +65,7 @@ namespace Appointments.Controllers
             return Ok(_appointmentRepository.GetAppointmentById(id));
         }
 
-        [HttpDelete]
+        [HttpDelete, Authorize]
         public ActionResult DeleteAppointment(int id)
         {
             if (!_appointmentRepository.AppointmentExists(id))
@@ -75,7 +76,7 @@ namespace Appointments.Controllers
             return Ok($"Appointment with ID {id} successfully deleted");
         }
 
-        [HttpPut]
+        [HttpPut, Authorize]
         public ActionResult UpdateAppointment(int id, Appointment updatedAppointment)
         {
             if (id != updatedAppointment.AppointmentId)
